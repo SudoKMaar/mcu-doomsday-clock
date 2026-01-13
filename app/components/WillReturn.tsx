@@ -3,9 +3,30 @@
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
+// Global state for visibility
+let willReturnEnabled = true;
+let listeners: ((enabled: boolean) => void)[] = [];
+
+export function setWillReturnEnabled(enabled: boolean) {
+  willReturnEnabled = enabled;
+  listeners.forEach((fn) => fn(enabled));
+}
+
+export function getWillReturnEnabled() {
+  return willReturnEnabled;
+}
+
+export function subscribeWillReturn(fn: (enabled: boolean) => void) {
+  listeners.push(fn);
+  return () => {
+    listeners = listeners.filter((l) => l !== fn);
+  };
+}
+
 export default function WillReturn() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
+  const [enabled, setEnabled] = useState(true);
   const lastTimeRef = useRef<number>(0);
   const cycleStartRef = useRef<number>(0);
   const startedRef = useRef(false);
@@ -13,16 +34,21 @@ export default function WillReturn() {
   const name = searchParams.get("name") || "KMaar";
 
   useEffect(() => {
+    const unsubscribe = subscribeWillReturn(setEnabled);
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+
     let animationId: number;
 
     const animate = (timestamp: number) => {
-      // Initialize on first frame
       if (!lastTimeRef.current) {
         lastTimeRef.current = timestamp;
-        cycleStartRef.current = timestamp + 5000; // 5s initial delay
+        cycleStartRef.current = timestamp + 5000;
       }
 
-      // Wait for initial delay
       if (timestamp < cycleStartRef.current) {
         animationId = requestAnimationFrame(animate);
         return;
@@ -35,7 +61,6 @@ export default function WillReturn() {
 
       const elapsed = timestamp - cycleStartRef.current;
 
-      // Determine step based on elapsed time
       if (elapsed < 500) {
         setStep(0);
       } else if (elapsed < 3000) {
@@ -45,7 +70,6 @@ export default function WillReturn() {
       } else if (elapsed < 9000) {
         setStep(3);
       } else {
-        // Reset cycle
         cycleStartRef.current = timestamp;
         setStep(0);
       }
@@ -56,7 +80,9 @@ export default function WillReturn() {
     animationId = requestAnimationFrame(animate);
 
     return () => cancelAnimationFrame(animationId);
-  }, []);
+  }, [enabled]);
+
+  if (!enabled) return null;
 
   return (
     <div className="absolute top-[70%] left-1/2 -translate-x-1/2 z-[100] pointer-events-none text-center whitespace-nowrap">

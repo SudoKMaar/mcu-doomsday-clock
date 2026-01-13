@@ -23,6 +23,12 @@ export default function DoomsdayClock() {
       mousePos.current = { x: e.clientX, y: e.clientY };
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        mousePos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+    };
+
     const animate = () => {
       const scene = sceneRef.current;
       if (!scene) {
@@ -48,10 +54,12 @@ export default function DoomsdayClock() {
     currentPos.current = { ...mousePos.current };
 
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("touchmove", handleTouchMove);
     animate();
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
       cancelAnimationFrame(animationRef.current);
     };
   }, []);

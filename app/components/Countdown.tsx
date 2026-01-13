@@ -61,6 +61,43 @@ export default function Countdown() {
     globalAudio = new Audio("/avengersdoomsday.mp3");
     globalAudio.loop = true;
     globalAudio.volume = 0.3;
+    globalAudio.preload = "auto";
+
+    let audioUnlocked = false;
+
+    // Try to play audio (handles both user interaction and autoplay)
+    const tryPlayAudio = () => {
+      if (!globalAudio || audioUnlocked) return;
+      
+      globalAudio.play()
+        .then(() => {
+          audioUnlocked = true;
+        })
+        .catch(() => {
+          // Autoplay blocked, will retry on user interaction
+        });
+    };
+
+    // Enable audio on first user interaction (browser autoplay policy)
+    const enableAudio = () => {
+      tryPlayAudio();
+      if (audioUnlocked) {
+        document.removeEventListener("click", enableAudio);
+        document.removeEventListener("touchstart", enableAudio);
+        document.removeEventListener("keydown", enableAudio);
+        document.removeEventListener("scroll", enableAudio);
+      }
+    };
+
+    document.addEventListener("click", enableAudio);
+    document.addEventListener("touchstart", enableAudio);
+    document.addEventListener("keydown", enableAudio);
+    document.addEventListener("scroll", enableAudio);
+
+    // Wait for audio to be ready
+    globalAudio.addEventListener("canplaythrough", () => {
+      // Audio is loaded and ready
+    });
 
     const startTimer = setTimeout(() => {
       const initialTime = calculateTimeLeft();
@@ -84,7 +121,8 @@ export default function Countdown() {
             minutes: formatTwoDigits(initialTime.minutes),
             seconds: formatTwoDigits(initialTime.seconds),
           });
-          globalAudio?.play().catch(() => {});
+          // Try to play when countdown starts
+          tryPlayAudio();
         } else {
           setDisplayValues({
             months: Array.from({ length: 2 }, () => chars[Math.floor(Math.random() * chars.length)]).join(""),
@@ -101,6 +139,10 @@ export default function Countdown() {
       clearTimeout(startTimer);
       globalAudio?.pause();
       globalAudio = null;
+      document.removeEventListener("click", enableAudio);
+      document.removeEventListener("touchstart", enableAudio);
+      document.removeEventListener("keydown", enableAudio);
+      document.removeEventListener("scroll", enableAudio);
     };
   }, []);
 
@@ -128,7 +170,7 @@ export default function Countdown() {
     <div className="countdown-container absolute top-[57%] left-1/2 -translate-x-1/2 translate-y-[90%] z-10 pointer-events-none whitespace-nowrap flex justify-center items-center opacity-0">
       {/* Static date */}
       <div
-        className="absolute font-[var(--font-cinzel)] text-[4vmin] font-bold text-white tracking-[1vmin] transition-opacity duration-500"
+        className="absolute font-[var(--font-cinzel)] text-[4vmin] sm:text-[3vmin] font-bold text-white tracking-[1vmin] sm:tracking-[0.5vmin] transition-opacity duration-500"
         style={{ 
           textShadow: "0 0.4vmin 2vmin rgba(255, 255, 255, 0.377)",
           opacity: showDate ? 1 : 0 
@@ -139,7 +181,7 @@ export default function Countdown() {
 
       {/* Countdown wrapper */}
       <div
-        className="flex items-start gap-[1.5vmin] transition-opacity duration-500"
+        className="flex items-start gap-[1.5vmin] sm:gap-[1vmin] transition-opacity duration-500"
         style={{ opacity: showDate ? 0 : 1 }}
       >
         <TimeBox value={displayValues.months} label="MONTHS" />
@@ -160,13 +202,13 @@ function TimeBox({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col items-center relative">
       <span
-        className="font-mono text-[3.5vmin] font-semibold text-white tracking-[0.5vmin] leading-none"
+        className="font-mono text-[3.5vmin] sm:text-[2.5vmin] font-semibold text-white tracking-[0.5vmin] leading-none"
         style={{ textShadow: "0 0.4vmin 1.5vmin rgba(0, 0, 0, 0.8)" }}
       >
         {value}
       </span>
       <span
-        className="text-[0.9vmin] font-bold uppercase text-gray-400 mt-[1vmin] tracking-[0.3vmin]"
+        className="text-[0.9vmin] sm:text-[0.7vmin] font-bold uppercase text-gray-400 mt-[1vmin] tracking-[0.3vmin]"
         style={{ textShadow: "0 0.2vmin 0.8vmin rgba(0, 0, 0, 1)" }}
       >
         {label}
@@ -178,7 +220,7 @@ function TimeBox({ value, label }: { value: string; label: string }) {
 function Separator() {
   return (
     <span
-      className="font-mono text-[3vmin] text-white font-semibold -mt-[0.3vmin]"
+      className="font-mono text-[3vmin] sm:text-[2vmin] text-white font-semibold -mt-[0.3vmin]"
       style={{ textShadow: "0 0.4vmin 1.5vmin rgba(0, 0, 0, 0.8)" }}
     >
       :

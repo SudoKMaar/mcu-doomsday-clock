@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getAudio } from "./Countdown";
+import { setWillReturnEnabled, getWillReturnEnabled } from "./WillReturn";
 
 interface UtilityButtonProps {
   icon: React.ReactNode;
@@ -12,7 +13,7 @@ interface UtilityButtonProps {
 
 function UtilityButton({ icon, label, onClick, href }: UtilityButtonProps) {
   const baseClass =
-    "p-2 rounded-md text-white/10 hover:bg-white/10 hover:text-white/80 transition-all duration-200 cursor-pointer";
+    "p-2 rounded-md text-white/40 hover:bg-white/10 hover:text-white/80 transition-all duration-200 cursor-pointer";
 
   if (href) {
     return (
@@ -35,14 +36,32 @@ function UtilityButton({ icon, label, onClick, href }: UtilityButtonProps) {
   );
 }
 
-// Icons - VolumeOn shows speaker with waves (audio playing), click to mute
+// Doctor Doom Mask Icon
+const DoomIcon = () => (
+  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+    {/* Hood outline */}
+    <path d="M12 2C7 2 4 6 4 10v8c0 2 2 4 4 4h8c2 0 4-2 4-4v-8c0-4-3-8-8-8z" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+    {/* Face plate */}
+    <path d="M7 8h10v10c0 1-1 2-2 2H9c-1 0-2-1-2-2V8z" opacity="0.3"/>
+    {/* Eye slits */}
+    <rect x="8" y="10" width="2.5" height="1" rx="0.5"/>
+    <rect x="13.5" y="10" width="2.5" height="1" rx="0.5"/>
+    {/* Mouth grill lines */}
+    <line x1="9" y1="14" x2="15" y2="14" stroke="currentColor" strokeWidth="0.75"/>
+    <line x1="9" y1="15.5" x2="15" y2="15.5" stroke="currentColor" strokeWidth="0.75"/>
+    <line x1="9" y1="17" x2="15" y2="17" stroke="currentColor" strokeWidth="0.75"/>
+    {/* Rivets */}
+    <circle cx="7" cy="12" r="0.5"/>
+    <circle cx="17" cy="12" r="0.5"/>
+  </svg>
+);
+
 const VolumeOnIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M17.95 6.05a8 8 0 010 11.9M6 9H4a1 1 0 00-1 1v4a1 1 0 001 1h2l4 4V5L6 9z" />
   </svg>
 );
 
-// VolumeOff shows muted speaker (audio muted), click to unmute
 const VolumeOffIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5v14a1 1 0 01-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
@@ -67,8 +86,29 @@ const PortfolioIcon = () => (
   </svg>
 );
 
+const CloseIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
+const TextOnIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+  </svg>
+);
+
+const TextOffIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+  </svg>
+);
+
 export default function UtilityBar() {
+  const [isOpen, setIsOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [textEnabled, setTextEnabled] = useState(true);
 
   const toggleMute = () => {
     const audio = getAudio();
@@ -78,28 +118,57 @@ export default function UtilityBar() {
     }
   };
 
+  const toggleText = () => {
+    const newState = !textEnabled;
+    setTextEnabled(newState);
+    setWillReturnEnabled(newState);
+  };
+
   return (
-    <div className="fixed bottom-4 right-4 z-[100] flex gap-1 rounded-lg bg-black/30 backdrop-blur-sm p-1">
-      <UtilityButton
-        icon={isMuted ? <VolumeOffIcon /> : <VolumeOnIcon />}
-        label={isMuted ? "Unmute" : "Mute"}
-        onClick={toggleMute}
-      />
-      <UtilityButton
-        icon={<GitHubIcon />}
-        label="GitHub"
-        href="https://github.com/SudoKMaar/mcu-doomsday-clock"
-      />
-      <UtilityButton
-        icon={<LinkedInIcon />}
-        label="LinkedIn"
-        href="https://www.linkedin.com/in/AbhishekKMaar/"
-      />
-      <UtilityButton
-        icon={<PortfolioIcon />}
-        label="Portfolio"
-        href="https://kmaar.vercel.app/"
-      />
+    <div className="fixed bottom-4 right-4 z-[100] flex flex-col items-end gap-2">
+      {/* Expandable Menu */}
+      <div
+        className={`flex flex-col gap-1 rounded-lg bg-black/30 backdrop-blur-sm p-1 transition-all duration-300 overflow-hidden ${
+          isOpen ? "opacity-100 translate-y-0 max-h-[300px]" : "opacity-0 translate-y-4 max-h-0 p-0"
+        }`}
+      >
+        <UtilityButton
+          icon={isMuted ? <VolumeOffIcon /> : <VolumeOnIcon />}
+          label={isMuted ? "Unmute" : "Mute"}
+          onClick={toggleMute}
+        />
+        <UtilityButton
+          icon={textEnabled ? <TextOnIcon /> : <TextOffIcon />}
+          label={textEnabled ? "Hide Text" : "Show Text"}
+          onClick={toggleText}
+        />
+        <UtilityButton
+          icon={<GitHubIcon />}
+          label="GitHub"
+          href="https://github.com/SudoKMaar/mcu-doomsday-clock"
+        />
+        <UtilityButton
+          icon={<LinkedInIcon />}
+          label="LinkedIn"
+          href="https://www.linkedin.com/in/AbhishekKMaar/"
+        />
+        <UtilityButton
+          icon={<PortfolioIcon />}
+          label="Portfolio"
+          href="https://kmaar.vercel.app/"
+        />
+      </div>
+
+      {/* Doom Toggle Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Close menu" : "Open menu"}
+        className={`p-3 rounded-full bg-black/30 backdrop-blur-sm text-white/30 hover:text-white/70 hover:bg-black/50 transition-all duration-300 cursor-pointer ${
+          isOpen ? "rotate-180" : ""
+        }`}
+      >
+        {isOpen ? <CloseIcon /> : <DoomIcon />}
+      </button>
     </div>
   );
 }
