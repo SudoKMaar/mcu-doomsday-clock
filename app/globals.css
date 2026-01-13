@@ -1,26 +1,130 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Cooper Hewitt';
+  src: url('/CooperHewitt-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --x: 50%;
+  --y: 50%;
+  --nx: 0;
+  --ny: 0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+body,
+html {
+  @apply w-full h-full overflow-hidden bg-black m-0 p-0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Scene animations - need .active parent selector */
+.scene.active {
+  animation: sceneEntry 1s ease-out forwards;
+}
+.scene.active .bg-base {
+  animation: introFade 5s ease-out forwards;
+}
+.scene.active .god-rays {
+  animation: rotateRays 80s linear infinite;
+}
+.scene.active .ambient-glow {
+  animation: introGlow 5s ease-out forwards, pulseBurst 5s ease-in-out infinite alternate;
+}
+.scene.active .fog-layer {
+  animation: fogMove 20s infinite alternate ease-in-out, introFade 6s ease-out forwards;
+}
+.scene.active .countdown-container {
+  animation: textEntry 2s ease-out 0.5s forwards;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Complex backgrounds with CSS variables - can't do in Tailwind */
+.god-rays {
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(0, 0, 0, 1) 0deg,
+    rgba(0, 0, 0, 1) 10deg,
+    rgba(255, 255, 255, 0.1) 15deg,
+    rgba(255, 255, 255, 0.3) 18deg,
+    rgba(255, 255, 255, 0.575) 21deg,
+    rgba(0, 0, 0, 0.301) 25deg
+  );
+  mask-image: radial-gradient(circle, black 0%, transparent 60%);
+  -webkit-mask-image: radial-gradient(circle, black 0%, transparent 60%);
+}
+
+.faux-3d-shadow {
+  background: radial-gradient(
+    circle at calc(50% - var(--nx) * 30vmin) calc(50% - var(--ny) * 30vmin),
+    transparent 20%,
+    rgba(0, 0, 0, 0.95) 65%
+  );
+}
+
+.faux-3d-specular {
+  background: radial-gradient(
+    45vmin circle at var(--x) var(--y),
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.1) 20%,
+    transparent 50%
+  );
+}
+
+.mouse-bloom {
+  background: radial-gradient(
+    70vmin circle at var(--x) var(--y),
+    rgba(193, 221, 199, 0.57) 0%,
+    rgba(0, 20, 10, 0.2) 40%,
+    transparent 70%
+  );
+}
+
+.fog-layer {
+  background: radial-gradient(ellipse at center, rgba(147, 192, 166, 0.26) 0%, transparent 60%);
+}
+
+.vignette {
+  background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.21) 80%, black 100%);
+}
+
+.particle-canvas {
+  mask-image: radial-gradient(circle, black 40%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle, black 40%, transparent 85%);
+}
+
+/* Keyframes */
+@keyframes sceneEntry {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes introFade {
+  0% { filter: brightness(0) contrast(1.2) saturate(0); }
+  100% { filter: brightness(1) contrast(1.11) saturate(1); }
+}
+
+@keyframes introGlow {
+  0% { filter: brightness(7) contrast(-1) blur(30px) saturate(0); opacity: 0; }
+  100% { filter: brightness(1) contrast(1) blur(0) saturate(1); opacity: 1; }
+}
+
+@keyframes textEntry {
+  0% { opacity: 0; filter: blur(1vmin); }
+  100% { opacity: 1; filter: blur(0); }
+}
+
+@keyframes pulseBurst {
+  0% { opacity: 0.5; filter: blur(0.5vmin); transform: scale(1); }
+  100% { opacity: 1; filter: blur(1.5vmin); transform: scale(1.05); }
+}
+
+@keyframes rotateRays {
+  from { transform: rotate(0deg) scale(1.4); }
+  to { transform: rotate(360deg) scale(1.4); }
+}
+
+@keyframes fogMove {
+  0% { transform: translateX(-5%) translateY(0); }
+  100% { transform: translateX(5%) translateY(2%); }
 }

@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MCU Doomsday Clock
+
+An immersive countdown experience for Avengers: Doomsday, releasing December 18, 2026.
+
+## Features
+
+- Cinematic countdown with animated visual effects
+- Mouse-reactive lighting (specular highlights, shadows, bloom)
+- Rotating god rays and fog effects
+- Floating particle system
+- Ambient background music
+- "X Will Return" animation with customizable name via URL parameter
+- Fully responsive design
+
+## Demo
+
+Visit: [mcu-doomsday-clock.vercel.app](https://mcu-doomsday-clock.vercel.app)
+
+Customize the name: `https://mcu-doomsday-clock.vercel.app?name=Tony%20Stark`
+
+## Tech Stack
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- CSS Animations & Blend Modes
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view it.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/
+├── components/
+│   ├── Countdown.tsx      # Countdown timer with shuffle animation
+│   ├── DoomsdayClock.tsx  # Main scene with visual layers
+│   ├── ParticleCanvas.tsx # Floating dust particles
+│   ├── UtilityBar.tsx     # Mute/social links
+│   └── WillReturn.tsx     # "X Will Return" text animation
+├── globals.css            # Keyframes & complex gradients
+├── layout.tsx             # Metadata & fonts
+└── page.tsx               # Entry point
+```
 
-## Learn More
+## Disclaimer
 
-To learn more about Next.js, take a look at the following resources:
+This project is an independent creation for artistic and technical demonstration purposes. It is not associated, affiliated, authorized, or endorsed by Marvel Entertainment, LLC or The Walt Disney Company.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Author
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Abhishek Kumar (KMaar)**
 
-## Deploy on Vercel
+- Portfolio: [kmaar.vercel.app](https://kmaar.vercel.app)
+- GitHub: [@SudoKMaar](https://github.com/SudoKMaar)
+- LinkedIn: [AbhishekKMaar](https://www.linkedin.com/in/AbhishekKMaar)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE.txt](LICENSE.txt) file for details.
