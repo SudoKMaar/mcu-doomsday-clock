@@ -14,6 +14,19 @@ interface DustParticle {
   angle: number;
 }
 
+// Global particle count with getter/setter
+let particleCount = 100;
+let onParticleCountChange: (() => void) | null = null;
+
+export function getParticleCount() {
+  return particleCount;
+}
+
+export function setParticleCount(count: number) {
+  particleCount = Math.max(10, Math.min(1000, count)); // Clamp between 10-1000
+  onParticleCountChange?.();
+}
+
 export default function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<DustParticle[]>([]);
@@ -53,8 +66,11 @@ export default function ParticleCanvas() {
     const init = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      particlesRef.current = Array.from({ length: 500 }, () => createParticle(true));
+      particlesRef.current = Array.from({ length: particleCount }, () => createParticle(true));
     };
+
+    // Listen for particle count changes
+    onParticleCountChange = init;
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -98,6 +114,7 @@ export default function ParticleCanvas() {
     return () => {
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationRef.current);
+      onParticleCountChange = null;
     };
   }, []);
 

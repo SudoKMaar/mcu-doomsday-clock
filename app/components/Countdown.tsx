@@ -39,11 +39,39 @@ function formatTwoDigits(num: number): string {
   return num < 10 ? "0" + num : "" + num;
 }
 
+// Audio tracks
+export const AUDIO_TRACKS = {
+  THEME: "/avengersdoomsday.mp3",
+  TICK: "/Doomsday clock sound effect.mp3",
+};
+
 // Export audio control functions
 let globalAudio: HTMLAudioElement | null = null;
+let currentTrack: string = AUDIO_TRACKS.THEME;
 
 export function getAudio() {
   return globalAudio;
+}
+
+export function getCurrentTrack() {
+  return currentTrack;
+}
+
+export function switchTrack(trackPath: string) {
+  if (!globalAudio) return;
+  
+  const wasPlaying = !globalAudio.paused;
+  const wasMuted = globalAudio.muted;
+  
+  globalAudio.pause();
+  globalAudio.src = trackPath;
+  currentTrack = trackPath;
+  globalAudio.load();
+  
+  if (wasPlaying) {
+    globalAudio.play().catch(() => {});
+  }
+  globalAudio.muted = wasMuted;
 }
 
 export default function Countdown() {
