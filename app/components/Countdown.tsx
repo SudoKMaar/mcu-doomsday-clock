@@ -100,21 +100,24 @@ export default function Countdown() {
       globalAudio.play()
         .then(() => {
           audioUnlocked = true;
+          // Remove all listeners once audio is playing
+          removeListeners();
         })
         .catch(() => {
           // Autoplay blocked, will retry on user interaction
         });
     };
 
+    const removeListeners = () => {
+      document.removeEventListener("click", enableAudio);
+      document.removeEventListener("touchstart", enableAudio);
+      document.removeEventListener("keydown", enableAudio);
+      document.removeEventListener("scroll", enableAudio);
+    };
+
     // Enable audio on first user interaction (browser autoplay policy)
     const enableAudio = () => {
       tryPlayAudio();
-      if (audioUnlocked) {
-        document.removeEventListener("click", enableAudio);
-        document.removeEventListener("touchstart", enableAudio);
-        document.removeEventListener("keydown", enableAudio);
-        document.removeEventListener("scroll", enableAudio);
-      }
     };
 
     document.addEventListener("click", enableAudio);
