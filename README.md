@@ -7,9 +7,10 @@ An immersive countdown experience for Avengers: Doomsday, releasing December 18,
 - Cinematic countdown with animated visual effects
 - Mouse-reactive lighting (specular highlights, shadows, bloom)
 - Rotating god rays and fog effects
-- Floating particle system
-- Ambient background music
+- Floating particle system with adjustable count for performance
+- Background music with track switching (theme song / tick-tock sound / mute)
 - "X Will Return" animation with customizable name via URL parameter
+- Utility bar with audio controls and particle settings
 - Fully responsive design
 
 ## Demo
@@ -48,8 +49,8 @@ app/
 ├── components/
 │   ├── Countdown.tsx      # Countdown timer with shuffle animation
 │   ├── DoomsdayClock.tsx  # Main scene with visual layers
-│   ├── ParticleCanvas.tsx # Floating dust particles
-│   ├── UtilityBar.tsx     # Mute/social links
+│   ├── ParticleCanvas.tsx # Floating dust particles (adjustable count)
+│   ├── UtilityBar.tsx     # Audio controls and particle settings
 │   └── WillReturn.tsx     # "X Will Return" text animation
 ├── globals.css            # Keyframes & complex gradients
 ├── layout.tsx             # Metadata & fonts
